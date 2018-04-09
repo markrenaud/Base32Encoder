@@ -38,11 +38,18 @@ public struct Base32 {
         "Y", "Z", "2", "3", "4", "5", "6", "7"]
 
     /**
-     Returns the index(es) and offsets of the quintet of bits from an array of octets (Bytes) aka `[UInt8]`
-     - Note: if the quintet of bits is fully contained within an octet, the `octet2Index` will be nil
-     - Parameter quintetIndex: the index (0-based) quintet-bit sequence to map against the indexes (0-based) of octet-bit sequences
-     - Returns: mapped octet-bit indexes of the `UInt8`s involved and the offset of the quintet-bits in the first octet
-     - Important: For better understanding - see block below
+     Returns the index(es) and offsets of the quintet of bits from
+     an array of octets (Bytes) aka `[UInt8]`
+     - Note:                    if the quintet of bits is fully
+                                contained within an octet, the
+                                `octet2Index` will be nil
+     - Parameter quintetIndex:  the index (0-based) quintet-bit
+                                sequence to map against the indexes
+                                (0-based) of octet-bit sequences
+     - Returns:                 mapped octet-bit indexes of the `UInt8`s
+                                involved and the offset of the quintet-bits
+                                in the first octet
+     - Important:               For better understanding - see block below
      ````
      +---------+----------+---------+
      |01234 567|01 23456 7|0123 4567|   Octets Offset
@@ -79,11 +86,11 @@ public struct Base32 {
     /**
      Joins two bytes together to form a 16-bit UInt
      - Parameter leadingByte:   an octet of bits (`UInt8`) that will
-     represent the leading 8-bits of resultant
-     `UInt16`
+                                represent the leading 8-bits of resultant
+                                `UInt16`
      - Parameter trailingByte:  an octet of bits (`UInt8`) that will
-     represent the trailing 8-bits of resultant
-     `UInt16`
+                                represent the trailing 8-bits of resultant
+                                `UInt16`
      - Returns:                 the combined 8-bit bytes as a 16-bit `UInt16`
      - Note:                    example combination
      ````
@@ -101,10 +108,10 @@ public struct Base32 {
         // convert the trailingByte to 16 bit
         // using the example from function documentation:
         // UInt8: 10000001 convert to UInt16: 00000000 10000001
-        let b16bit:UInt16 = UInt16(trailingByte)      // 00000000 | 10000001
+        let b16bit:UInt16 = UInt16(trailingByte)      // 00000000 10000001
         // bitwise OR sextetPartA and sextetPartB
         // to give final combined UInt16
-        let combined = a16bit | b16bit       // 00000001 | 10000001
+        let combined = a16bit | b16bit       // 00000001 10000001
         return combined
     }
     
@@ -113,11 +120,15 @@ public struct Base32 {
      Retrieves a number of bits from a given `UInt16` and returns the
      representation of those bits as `UInt16`.  See the note for a worked
      example.
-     - Parameter numberOfBits: the number of bits to retrieve
-     - Parameter from: the 16-bit `UInt16` from which to retrieve the bits
-     - Parameter offset: the offset of the bits to retrieve from the leading bit
-     - Returns: the desired bits placed as trailing bits within a 16-bit integer
-     - Note: example of retrieving 5 bits offset from the leading bit by 3
+     - Parameter numberOfBits:  the number of bits to retrieve
+     - Parameter from:          the 16-bit `UInt16` from which to retrieve
+                                the bits
+     - Parameter offset:        the offset of the bits to retrieve from
+                                the leading bit
+     - Returns:                 the desired bits placed as trailing bits
+                                within a 16-bit integer
+     - Note:                    example of retrieving 5 bits offset from
+                                the leading bit by 3
      ````
      16-bit     = 0111010011110100         = 0b0111010011110100 -> 29940
      desired    = ---10100--------         = 0b10100            -> 20
@@ -138,7 +149,11 @@ public struct Base32 {
     
     /**
      Converts a data array to an array of 5-bit values held in a `UInt8` array.
-     - Note: max value of any number in the resultant aray will be `0b00011111` = `31` as we will be only using the 5-bits of the `UInt8`.  If there are not enough bits in the `UInt8` array to fill up the last 5-bit value, it should be padded with trailing `0`s (see example below)
+     - Note: max value of any number in the resultant aray will be
+             `0b00011111` = `31` as we will be only using the 5-bits
+             of the `UInt8`.  If there are not enough bits in the `UInt8`
+             array to fill up the last 5-bit value, it should be padded
+             with trailing `0`s (see example below)
      ````
      Example 8-bit byte data:
      [01110100] [11110111]
@@ -185,9 +200,12 @@ public struct Base32 {
     
     /**
      Converts bytes of data into a Base32 encoded string based on RFC3548
-     - parameter data: the `Data` to encode
-     - parameter padding: a boolean representing whether the padding character (`=`) should be appended to bring the number of characters in the string to a multiple of 8 (`false` by default)
-     - returns: `String` containing the Base32 encoded data
+     - parameter data:      the `Data` to encode
+     - parameter padding:   a boolean representing whether the padding character
+                            (`=`) should be appended to bring the number of
+                            characters in the string to a multiple of 8 (`false`
+                            by default)
+     - returns:             `String` containing the Base32 encoded data
      */
     public static func encode(data: Data, padding: Bool = false) -> String {
         let mapped = dataTo5BitValueArray(data: data).map { (inputBits) -> String in
@@ -210,8 +228,12 @@ public struct Base32 {
 
 extension Data {
     /**
-     Returns Base32 encoded string representation of the data (based on RFC3548)
-     - parameter padded: a boolean representing whether the padding character (`=`) should be appended to bring the total number of characters in the string to a multiple of 8 (`false` by default)
+     Returns Base32 encoded string representation of the data (based on
+     RFC3548)
+     - parameter padded:    a boolean representing whether the padding
+                            character (`=`) should be appended to bring the total
+                            number of characters in the string to a multiple of 8
+                            (`false` by default)
      */
     public func base32String(padded: Bool = false) -> String {
         return Base32.encode(data: self, padding: padded)
