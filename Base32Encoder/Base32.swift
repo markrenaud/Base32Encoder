@@ -178,8 +178,6 @@ public struct Base32 {
             let requiredBits = getBitValue(numberOfBits: 5, from: twoBytes, offset: UInt16(mapping.bitOffset))
             quintets.append(UInt8(requiredBits))
             representation.append(encodingTable[Int(requiredBits)])
-            print(quintets)
-            print(representation)
         }
         
         return quintets
