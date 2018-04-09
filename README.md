@@ -1,5 +1,5 @@
 #  Base32Encoder 
-[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
+[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage) [![Build Status](https://travis-ci.org/markrenaud/Base32Encoder.svg?branch=master)](https://travis-ci.org/markrenaud/Base32Encoder) [![codecov](https://codecov.io/gh/markrenaud/Base32Encoder/branch/master/graph/badge.svg)](https://codecov.io/gh/markrenaud/Base32Encoder)
 
 Base32Encoder is a pure Swift library that encodes Data to a Base32 String
 
