@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		63665166207BB2BC00852F81 /* .travis.yml in Resources */ = {isa = PBXBuildFile; fileRef = 63665165207BB2BC00852F81 /* .travis.yml */; };
 		63F6DD37207B6F96005642EF /* Base32Encoder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63F6DD2D207B6F96005642EF /* Base32Encoder.framework */; };
 		63F6DD3C207B6F96005642EF /* Base32EncoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63F6DD3B207B6F96005642EF /* Base32EncoderTests.swift */; };
 		63F6DD3E207B6F96005642EF /* Base32Encoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 63F6DD30207B6F96005642EF /* Base32Encoder.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -25,6 +26,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		63665165207BB2BC00852F81 /* .travis.yml */ = {isa = PBXFileReference; lastKnownFileType = text; path = .travis.yml; sourceTree = "<group>"; };
 		63F6DD2D207B6F96005642EF /* Base32Encoder.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Base32Encoder.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		63F6DD30207B6F96005642EF /* Base32Encoder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Base32Encoder.h; sourceTree = "<group>"; };
 		63F6DD31207B6F96005642EF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -58,6 +60,7 @@
 		63F6DD23207B6F96005642EF = {
 			isa = PBXGroup;
 			children = (
+				63665165207BB2BC00852F81 /* .travis.yml */,
 				63F6DD78207B782F005642EF /* LICENCE */,
 				63F6DD7A207B7976005642EF /* README.md */,
 				63F6DD2F207B6F96005642EF /* Base32Encoder */,
@@ -186,6 +189,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				63665166207BB2BC00852F81 /* .travis.yml in Resources */,
 				63F6DD79207B782F005642EF /* LICENCE in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
