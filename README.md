@@ -20,7 +20,7 @@ Copy `Base32.swift` to your project
 ## Usage
 
 If the Base32Encoder was installed as a library, you must import it (this can be skipped if it was manually added to your project).
-`import import Base32Encoder`
+`import Base32Encoder`
 
 You can then encode data and (optionally pad as per [RFC 3548 2.2 - Padding of encoded data](https://tools.ietf.org/html/rfc3548#section-2.2)
 ```swift
