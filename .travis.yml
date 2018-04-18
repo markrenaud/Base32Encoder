@@ -12,7 +12,7 @@ matrix:
 script:
   - swift -version
   - xcodebuild -version
-  - xcodebuild - showsdks
+  - xcodebuild -showsdks
   - xcodebuild clean test -project "$PROJ" -scheme "$SCHEME" -destination "$DESTINATION" -enableCodeCoverage YES
 
 after_success:
