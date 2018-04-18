@@ -1,5 +1,19 @@
-language: swift
-osx_image: xcode9.3beta
+env:
+  global:
+    - IOS_SCHEME="Base32Encoder"
+
+matrix:
+  include:
+    - os: osx
+      language: objective-c
+      osx_image: xcode9.3
+      env: PROJ="Base32Encoder.xcodeproj"  DESTINATION="OS=11.3,name=iPhone X" SCHEME="$IOS_SCHEME"
+
 script:
-  - xcodebuild -project Base32Encoder.xcodeproj -scheme Base32Encoder -sdk iphonesimulator -enableCodeCoverage YES -destination "platform=iOS Simulator,name=iPhone 6S,OS=11.3" build test
+  - swift -version
+  - xcodebuild -version
+  - xcodebuild - showsdks
+  - xcodebuild clean test -project "$PROJ" -scheme "$SCHEME" -destination "$DESTINATION" -enableCodeCoverage YES
+
+after_success:
   - bash <(curl -s https://codecov.io/bash) -X xcodeplist
