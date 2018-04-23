@@ -38,7 +38,8 @@ class Base32EncoderTests: XCTestCase {
         super.tearDown()
     }
     
-    // Mark: - Test overall encoding
+    // Mark: - Test encode
+    
     func testEncodeHello() {
         let data = "hello".data(using: .ascii)!
         
@@ -62,7 +63,135 @@ class Base32EncoderTests: XCTestCase {
         
     }
     
-    // Mark: - Test helper components
+    
+    func testEncodeRFC4648Examples() {
+        var data = "".data(using: .ascii)!
+        XCTAssertEqual(Base32.encode(data: data, padding: true), "")
+        
+        data = "f".data(using: .ascii)!
+        XCTAssertEqual(Base32.encode(data: data, padding: true), "MY======")
+
+        data = "fo".data(using: .ascii)!
+        XCTAssertEqual(Base32.encode(data: data, padding: true), "MZXQ====")
+
+        data = "foo".data(using: .ascii)!
+        XCTAssertEqual(Base32.encode(data: data, padding: true), "MZXW6===")
+        
+        data = "foob".data(using: .ascii)!
+        XCTAssertEqual(Base32.encode(data: data, padding: true), "MZXW6YQ=")
+
+        data = "fooba".data(using: .ascii)!
+        XCTAssertEqual(Base32.encode(data: data, padding: true), "MZXW6YTB")
+
+        data = "foobar".data(using: .ascii)!
+        XCTAssertEqual(Base32.encode(data: data, padding: true), "MZXW6YTBOI======")
+
+    }
+    
+    
+    // Mark: - Test Decoder
+    func testDecodeThrowsOnInvalidString() {
+        
+        var invalidString = "123BDG$"
+        XCTAssertThrowsError(try Base32.decode(string: invalidString))
+
+        invalidString = "123bBDG"
+        XCTAssertThrowsError(try Base32.decode(string: invalidString))
+
+        invalidString = "8"
+        XCTAssertThrowsError(try Base32.decode(string: invalidString))
+
+        invalidString = "1"
+        XCTAssertThrowsError(try Base32.decode(string: invalidString))
+
+        
+        invalidString = "0"
+        XCTAssertThrowsError(try Base32.decode(string: invalidString))
+        
+        invalidString = "abc"
+        XCTAssertThrowsError(try Base32.decode(string: invalidString))
+        
+        let validString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
+        XCTAssertNoThrow(try Base32.decode(string: validString))
+
+    }
+    
+    func testDecodeThorwsOnInvalidPaddedStringLength() {
+        XCTAssertNoThrow(try Base32.decode(string: "MZXW6YTBOI======", padded: true))
+        XCTAssertThrowsError(try Base32.decode(string: "MZXW6YTBOI=====", padded: true))
+        XCTAssertThrowsError(try Base32.decode(string: "MZXW6YTBOI====", padded: true))
+        XCTAssertThrowsError(try Base32.decode(string: "MZXW6YTBOI===", padded: true))
+        XCTAssertThrowsError(try Base32.decode(string: "MZXW6YTBOI==", padded: true))
+        XCTAssertThrowsError(try Base32.decode(string: "MZXW6YTBOI=", padded: true))
+        XCTAssertThrowsError(try Base32.decode(string: "MZXW6YTBOI", padded: true))
+        XCTAssertThrowsError(try Base32.decode(string: "MZXW6YTBO", padded: true))
+        XCTAssertNoThrow(try Base32.decode(string: "MZXW6YTB", padded: true))
+    }
+    
+    
+    
+    func testDecodeHello() {
+        XCTAssertEqual(try Base32.decode(string: "NBSWY3DP"), "hello".data(using: .ascii)!)
+    }
+
+    func testDecodeABCD() {
+        XCTAssertEqual(try Base32.decode(string: "IFBEGRA"), "ABCD".data(using: .ascii)!)
+    }
+
+    
+    func testDecodeZ() {
+        XCTAssertEqual(try Base32.decode(string: "LI", padded: false), "Z".data(using: .ascii)!)
+        XCTAssertEqual(try Base32.decode(string: "LI======", padded: true), "Z".data(using: .ascii)!)
+    }
+    
+    
+    func testDecodeLongString() {
+        XCTAssertEqual(
+            try Base32.decode(
+                    string: "O5UGC5BAORUGKIJAI5CVIICPKVKCAT2GEBEEKUSFEATCAKY",
+                    padded: false),
+            "what the! GET OUT OF HERE & +".data(using: .ascii)!
+        )
+        XCTAssertEqual(
+            try Base32.decode(
+                string: "O5UGC5BAORUGKIJAI5CVIICPKVKCAT2GEBEEKUSFEATCAKY=",
+                padded: true),
+            "what the! GET OUT OF HERE & +".data(using: .ascii)!
+        )
+    }
+
+    
+    func testDecodeRFC4648Examples() {
+        XCTAssertEqual(try Base32.decode(string: "", padded: true), "".data(using: .ascii)!)
+        XCTAssertEqual(try Base32.decode(string: "MY======", padded: true), "f".data(using: .ascii)!)
+        XCTAssertEqual(try Base32.decode(string: "MZXQ====", padded: true), "fo".data(using: .ascii)!)
+        XCTAssertEqual(try Base32.decode(string: "MZXW6===", padded: true), "foo".data(using: .ascii)!)
+        XCTAssertEqual(try Base32.decode(string: "MZXW6YQ=", padded: true), "foob".data(using: .ascii)!)
+        XCTAssertEqual(try Base32.decode(string: "MZXW6YTB", padded: true), "fooba".data(using: .ascii)!)
+        XCTAssertEqual(try Base32.decode(string: "MZXW6YTBOI======", padded: true), "foobar".data(using: .ascii)!)
+    }
+    
+    // MARK: - Test README.md examples
+    func testReadMeExamples() {
+        let data = "hi".data(using: .ascii)!
+        let base32 = Base32.encode(data: data) // = "NBUQ"
+        let base32padded = Base32.encode(data: data, padding: true) // = "NBUQ===="
+        
+        XCTAssertEqual(base32, "NBUQ")
+        XCTAssertEqual(base32padded, "NBUQ====")
+        
+        let decodeBase32DataPadded = try? Base32.decode(string: "NBUQ====", padded: true)
+        let decodedString = String(data: decodeBase32DataPadded!, encoding: .ascii) // = "hi"
+        
+        XCTAssertEqual(decodedString, "hi")
+        if let decoded = try? "NBUQ====".decodeBase32(padded: true) {
+            let string = String(data: decoded, encoding: .ascii)    // = "hi"
+            XCTAssertEqual(string, "hi")
+        }
+    }
+    
+    
+    // MARK: - Test helper components
     
     
     func testOctetsForQuintet() {
@@ -187,10 +316,18 @@ class Base32EncoderTests: XCTestCase {
         XCTAssertEqual(Base32.dataTo5BitValueArray(data: dataB), expectedB)
     }
     
-    func testDataExtenstion() {
+    // MARK: - Test Extensions
+    
+    func testDataExtension() {
         let data = "Z".data(using: .ascii)!
         XCTAssertEqual(data.base32String(), "LI")
         XCTAssertEqual(data.base32String(padded: true), "LI======")
+    }
+    
+    func testStringExtension() {
+        let string = "MZXW6YTBOI======"
+        let data = "foobar".data(using: .ascii)
+        XCTAssertEqual(try string.decodeBase32(padded: true), data)
     }
     
 }

@@ -25,6 +25,11 @@
 
 import Foundation
 
+public enum Base32Error: Error {
+    case invalidBase32String
+    case invalidBase32PaddedStringLength
+}
+
 public struct Base32 {
     
     internal static let encodingTable = [
@@ -36,6 +41,41 @@ public struct Base32 {
         "Q", "R", "S", "T", "U", "V", "W", "X",
     //   24   25   26   27   28   29   30   31
         "Y", "Z", "2", "3", "4", "5", "6", "7"]
+    
+    internal static let decodingTable: [Character:String] = [
+        "A": "00000",
+        "B": "00001",
+        "C": "00010",
+        "D": "00011",
+        "E": "00100",
+        "F": "00101",
+        "G": "00110",
+        "H": "00111",
+        "I": "01000",
+        "J": "01001",
+        "K": "01010",
+        "L": "01011",
+        "M": "01100",
+        "N": "01101",
+        "O": "01110",
+        "P": "01111",
+        "Q": "10000",
+        "R": "10001",
+        "S": "10010",
+        "T": "10011",
+        "U": "10100",
+        "V": "10101",
+        "W": "10110",
+        "X": "10111",
+        "Y": "11000",
+        "Z": "11001",
+        "2": "11010",
+        "3": "11011",
+        "4": "11100",
+        "5": "11101",
+        "6": "11110",
+        "7": "11111"
+    ]
 
     /**
      Returns the index(es) and offsets of the quintet of bits from
@@ -224,6 +264,77 @@ public struct Base32 {
         return encodedString
     }
     
+    /**
+     Converts Base32 string (RFC3548) into bytes of data
+     - parameter string:    the Base32 string to decode
+     - parameter padded:    a boolean representing whether the Base32 string is padded:
+                            ie. (`=`) is appended to bring the number of characters in
+                            the string to a multiple of 8. (`false`by default)
+     - returns:             `Data` containing the Base32 encoded data
+     - throws:              if the string is not a valid base32 string (or correct size if padded)
+     */
+    public static func decode(string encodedString: String, padded: Bool = false) throws -> Data {
+        
+        // Verify string size is a multiple of 8 if we expect padding
+        if padded {
+            guard encodedString.count % 8 == 0 else {
+                throw Base32Error.invalidBase32PaddedStringLength
+            }
+        }
+        
+        // Verify string only contains valid Base32 characters (allow `=` as a valid character
+        // if a padded string
+        var validCharacters = CharacterSet(charactersIn: Base32.encodingTable.joined())
+        if padded {
+            validCharacters.insert("=")
+        }
+        let stringCharacters = CharacterSet(charactersIn: encodedString)
+        
+        guard stringCharacters.isSubset(of: validCharacters) else {
+            throw Base32Error.invalidBase32String
+        }
+        
+        var strippedEncodedString = encodedString
+        if padded {
+            // remove trailing `=`
+            if let leadingCharacters = strippedEncodedString.split(separator: "=", maxSplits: 1, omittingEmptySubsequences: true).first {
+                strippedEncodedString = String(leadingCharacters)
+            }
+        }
+
+        // create a long binary string from the decoded character quintets
+        // we can use ! here as we are guaranteed to only have characters in the decoding table
+        // by character set guarding above
+        let binaryString = strippedEncodedString.map { decodingTable[$0]! }.joined()
+        
+        // break into binary octets - note the last octet may be less than 8 characters
+        // we can discard it - as it is additional '0's not required
+        var octetStrings = stride(from: 0, to: binaryString.count, by: 8).map { (startPosition) -> String in
+            let startIndex = binaryString.index(binaryString.startIndex, offsetBy: startPosition)
+            let endPosition = min(startPosition + 8, binaryString.count)
+            let endIndex = binaryString.index(binaryString.startIndex, offsetBy: endPosition)
+            let octetString = String(binaryString[startIndex..<endIndex])
+            return octetString
+        }
+        
+        // discard any non-complete octet
+        if let lastOctet = octetStrings.last {
+            if lastOctet.count < 8 {
+                let _ = octetStrings.popLast()
+            }
+        }
+        
+        // convert octet strings to bytes
+        let bytes = octetStrings.map { (octetString) -> UInt8 in
+            return UInt8(octetString, radix: 2) ?? 0
+        }
+        
+        
+        return Data(bytes)
+
+    }
+
+    
 }
 
 extension Data {
@@ -237,5 +348,18 @@ extension Data {
      */
     public func base32String(padded: Bool = false) -> String {
         return Base32.encode(data: self, padding: padded)
+    }
+}
+
+extension String {
+    /**
+     Decodes a Base32 `String` into `Data` (based on RFC3548)
+     - parameter padded:    a boolean representing whether the Base32 string is padded:
+     ie. (`=`) is appended to bring the number of characters in
+     the string to a multiple of 8. (`false`by default)
+     - throws:              if the string is not a valid base32 string (or correct size if padded)
+    */
+    public func decodeBase32(padded: Bool = false) throws -> Data {
+        return try Base32.decode(string: self, padded: padded)
     }
 }
